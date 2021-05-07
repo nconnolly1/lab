@@ -2,22 +2,6 @@
 - hosts: all
   become: true
   tasks:
-  - name: Add static IP address for node
-    blockinfile:
-      path: /etc/netplan/60-static.yaml
-      block: |
-        network:
-          version: 2
-          renderer: networkd
-          ethernets:
-            eth0:
-              addresses:
-                - {{ node_ip }}/24
-      create: yes
-
-  - name: Apply networking changes
-    command: netplan apply
-
   - name: Remove boot delay
     lineinfile:
       path: /etc/default/grub
