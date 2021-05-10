@@ -102,7 +102,7 @@
 
   - name: Install Flannel pod network
     become: false
-    command: kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
+    command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
   - name: Generate join command
     command: kubeadm token create --print-join-command
