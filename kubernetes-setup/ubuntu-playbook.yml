@@ -7,7 +7,7 @@
       path: /etc/netplan/01-netcfg.yaml
       regexp: 'dhcp-identifier:'
       insertafter: 'dhcp4:'
-      line:       dhcp-identifier: mac
+      line: '      dhcp-identifier: mac'
 
   - name: Remove boot delay
     lineinfile:
