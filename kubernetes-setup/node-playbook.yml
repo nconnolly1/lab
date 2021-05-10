@@ -2,15 +2,6 @@
 - hosts: all
   become: true
   tasks:
-  - name: Remove boot delay
-    lineinfile:
-      path: /etc/default/grub
-      insertafter: EOF
-      line: GRUB_RECORDFAIL_TIMEOUT=5
-
-  - name: Update grub
-    command: update-grub
-
   - name: Install packages that allow apt to be used over HTTPS
     apt:
       name: "{{ packages }}"

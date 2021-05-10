@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Use MAC address for DHCP
+    lineinfile:
+      path: /etc/netplan/01-netcfg.yaml
+      regexp: 'dhcp-identifier:'
+      insertafter: 'dhcp4:'
+      line:       dhcp-identifier: mac
+
+  - name: Remove boot delay
+    lineinfile:
+      path: /etc/default/grub
+      insertafter: EOF
+      line: GRUB_RECORDFAIL_TIMEOUT=5
+
+  - name: Update grub
+    command: update-grub
