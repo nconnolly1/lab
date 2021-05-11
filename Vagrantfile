@@ -5,6 +5,8 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
 
     config.vm.provider "hyperv" do |v|
+        v.enable_virtualization_extensions = true
+        v.linked_clone = true
         v.memory = 8192
         v.cpus = 4
     end
