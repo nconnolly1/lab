@@ -28,7 +28,7 @@
     become: false
     command: "{{ item }}"
     with_items:
-     - kubectl create -f https://docs.projectcalico.org/v3.9/manifests/calico.yaml
+     - kubectl create -f https://docs.projectcalico.org/manifests/calico.yaml
      - kubectl -n kube-system set env daemonset/calico-node FELIX_IGNORELOOSERPF=true
 
   - name: Generate join command
