@@ -5,19 +5,19 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
 
     config.vm.provider "hyperv" do |v|
-        v.memory = 2048
-        v.cpus = 2
+        v.memory = 8192
+        v.cpus = 4
     end
 
     config.vm.define "k8s-master" do |master|
-        master.vm.provider "hyperv" do |v|
-            v.mac = "00155D005210"
-        end
         master.vm.box = IMAGE_NAME
         master.vm.network "private_network", ip: "192.168.50.10"
         master.vm.hostname = "k8s-master"
         master.vm.provision "ansible" do |ansible|
             ansible.playbook = "kubernetes-setup/ubuntu-playbook.yml"
+            ansible.extra_vars = {
+                node_ip: "192.168.50.10", gateway_ip: "192.168.50.1",
+            }
         end
         master.vm.provision :reload
         master.vm.provision "ansible" do |ansible|
@@ -30,14 +30,14 @@ Vagrant.configure("2") do |config|
 
     (1..N).each do |i|
         config.vm.define "node-#{i}" do |node|
-            node.vm.provider "hyperv" do |v|
-                v.mac = "00155D0052#{i + 10}"
-            end
             node.vm.box = IMAGE_NAME
             node.vm.network "private_network", ip: "192.168.50.#{i + 10}"
             node.vm.hostname = "node-#{i}"
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "kubernetes-setup/ubuntu-playbook.yml"
+                ansible.extra_vars = {
+                    node_ip: "192.168.50.#{i + 10}", gateway_ip: "192.168.50.1",
+                }
             end
             node.vm.provision :reload
             node.vm.provision "ansible" do |ansible|

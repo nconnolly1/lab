@@ -2,12 +2,23 @@
 - hosts: all
   become: true
   tasks:
-  - name: Use MAC address for DHCP
+  - name: Disable DHCP for eth0 
     lineinfile:
       path: /etc/netplan/01-netcfg.yaml
-      regexp: 'dhcp-identifier:'
-      insertafter: 'dhcp4:'
-      line: '      dhcp-identifier: mac'
+      regexp: 'dhcp4: true'
+      state: absent
+
+  - name: Define static IP address
+    blockinfile:
+      path: /etc/netplan/01-netcfg.yaml
+      insertafter: 'eth0:'
+      block: |
+            addresses:
+                - {{ node_ip }}/24
+            gateway4: {{ gateway_ip }}
+            nameservers:
+                search: [lab.local, englab.local]
+                addresses: [{{ gateway_ip }}]
 
   - name: Remove boot delay
     lineinfile:
@@ -17,3 +28,20 @@
 
   - name: Update grub
     command: update-grub
+
+  - name: Enable Huge Page Support
+    lineinfile:
+      path: /etc/sysctl.conf
+      line: vm.nr_hugepages = 512
+      create: yes
+
+  - name: Load required modules
+    blockinfile:
+      path: /etc/modules-load.d/mayastor.conf
+      create: yes
+      owner: root
+      group: root
+      mode: '0644'
+      block: |
+        nvme-tcp
+        xfs
