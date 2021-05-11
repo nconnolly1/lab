@@ -12,7 +12,7 @@
     blockinfile:
       path: /etc/netplan/01-netcfg.yaml
       insertafter: 'eth0:'
-      block: |
+      block: |6
             addresses:
                 - {{ node_ip }}/24
             gateway4: {{ gateway_ip }}
