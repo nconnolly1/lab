@@ -12,11 +12,12 @@
     blockinfile:
       path: /etc/netplan/01-netcfg.yaml
       insertafter: 'eth0:'
-      block: |6
-            addresses:
+      block: |
+        # Static IP address
+              addresses:
                 - {{ node_ip }}/24
-            gateway4: {{ gateway_ip }}
-            nameservers:
+              gateway4: {{ gateway_ip }}
+              nameservers:
                 search: [lab.local, englab.local]
                 addresses: [{{ gateway_ip }}]
 
