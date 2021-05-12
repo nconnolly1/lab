@@ -94,12 +94,6 @@
         - kubeadm 
         - kubectl
 
-  - name: Enable Huge Page Support
-    lineinfile:
-      path: /etc/sysctl.conf
-      line: vm.nr_hugepages = 512
-      create: yes
-
   - name: Load modules for Mayastor
     blockinfile:
       path: /etc/modules-load.d/mayastor.conf

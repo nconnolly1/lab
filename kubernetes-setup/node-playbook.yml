@@ -2,6 +2,15 @@
 - hosts: all
   become: true
   tasks:
+  - name: Enable Huge Pages
+    lineinfile:
+      path: /etc/sysctl.conf
+      line: vm.nr_hugepages = 512
+      create: yes
+
+  - name: Update sysctl values
+    copy: sysctl -q -p
+  
   - name: Configure node ip
     lineinfile:
       path: /etc/default/kubelet
