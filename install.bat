@@ -22,6 +22,20 @@ if errorlevel 1 (
 	if errorlevel 1 goto :eof
 )
 
+where /q packer
+if errorlevel 1 (
+	echo Installing Packer ...
+	choco install packer -y -r
+	if errorlevel 1 goto :eof
+)
+
+where /q terraform
+if errorlevel 1 (
+	echo Installing Terraform ...
+	choco install terraform -y -r
+	if errorlevel 1 goto :eof
+)
+
 echo Install WSL, then install Vagrant in WSL
 goto :eof
 
