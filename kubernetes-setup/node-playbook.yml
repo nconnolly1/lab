@@ -9,7 +9,7 @@
       create: yes
 
   - name: Update sysctl values
-    copy: sysctl -q -p
+    command: sysctl -q -p
   
   - name: Configure node ip
     lineinfile:
