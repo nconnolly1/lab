@@ -99,7 +99,7 @@
         - kubeadm 
         - kubectl
 
-  - name: Hold kubelet, kubeadm and kubectl
+  - name: Hold Kubernetes installs
     dpkg_selections:
       name: "{{ item }}"
       selection: hold
