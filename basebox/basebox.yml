@@ -54,6 +54,11 @@
     notify:
       - docker status
 
+  - name: Hold docker
+    dpkg_selections:
+      name: docker-ce
+      selection: hold
+
   - name: Add vagrant user to docker group
     user:
       name: vagrant
@@ -88,6 +93,16 @@
       name: "{{ packages }}"
       state: present
       update_cache: yes
+    vars:
+      packages:
+        - kubelet 
+        - kubeadm 
+        - kubectl
+
+  - name: Hold kubelet, kubeadm and kubectl
+    dpkg_selections:
+      name: "{{ packages }}"
+      selection: hold
     vars:
       packages:
         - kubelet 
