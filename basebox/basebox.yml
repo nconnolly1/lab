@@ -101,13 +101,12 @@
 
   - name: Hold kubelet, kubeadm and kubectl
     dpkg_selections:
-      name: "{{ packages }}"
+      name: "{{ item }}"
       selection: hold
-    vars:
-      packages:
-        - kubelet 
-        - kubeadm 
-        - kubectl
+    with_items:
+      - kubelet 
+      - kubeadm 
+      - kubectl
 
   - name: Load modules for Mayastor
     blockinfile:
