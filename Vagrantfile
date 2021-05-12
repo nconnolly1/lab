@@ -7,17 +7,17 @@ Vagrant.configure("2") do |config|
     config.vm.provider "hyperv" do |v|
         v.enable_virtualization_extensions = true
         v.linked_clone = true
-        v.memory = 8192
-        v.cpus = 4
+        v.memory = 2048
+        v.cpus = 2
     end
 
-    config.vm.define "k8s-master" do |master|
+    config.vm.define "master" do |master|
         master.vm.provider "hyperv" do |v|
             v.mac = "00155D005210"
         end
         master.vm.box = IMAGE_NAME
         master.vm.network "private_network", ip: "192.168.50.10"
-        master.vm.hostname = "k8s-master"
+        master.vm.hostname = "master"
         master.vm.provision "ansible" do |ansible|
             ansible.playbook = "kubernetes-setup/master-playbook.yml"
             ansible.extra_vars = {
@@ -30,6 +30,8 @@ Vagrant.configure("2") do |config|
         config.vm.define "node-#{i}" do |node|
             node.vm.provider "hyperv" do |v|
                 v.mac = "00155D0052#{i + 10}"
+                v.memory = 4096
+                v.cpus = 4
             end
             node.vm.box = IMAGE_NAME
             node.vm.network "private_network", ip: "192.168.50.#{i + 10}"
