@@ -47,3 +47,7 @@ kubectl -n mayastor get msp
 kubectl create -f /vagrant/mayastor/pvc-1.yaml
 kubectl get pvc ms-volume-claim
 ~~~
+
+~~~sh
+kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/develop/deploy/fio.yaml
+~~~
