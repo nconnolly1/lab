@@ -119,6 +119,12 @@
         nvme-tcp
         xfs
 
+  - name: Install NVMe cli
+    apt: 
+      name: nvme-cli
+      state: present
+      update_cache: yes
+
   handlers:
     - name: docker status
       service: name=docker state=started
