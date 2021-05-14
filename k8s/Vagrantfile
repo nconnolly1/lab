@@ -1,4 +1,4 @@
-IMAGE_NAME = "nconnolly1/basebox"
+IMAGE_NAME = "nconnolly1/ubuntu-20.04-k8s"
 N = 3
 
 Vagrant.configure("2") do |config|
