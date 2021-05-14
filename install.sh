@@ -5,4 +5,4 @@ curl -o "$PKG" https://releases.hashicorp.com/vagrant/2.2.16/vagrant_2.2.16_x86_
 sudo apt install "$PKG"
 rm -f "$PKG"
 
-vagrant plugin install vagrant-reload
+sudo apt install ansible

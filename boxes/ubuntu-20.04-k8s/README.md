@@ -14,6 +14,12 @@ cat /dev/null > ~/.bash_history && history -c && exit
 ~~~
 
 ~~~sh
-vagrant package --output basebox.box
-vagrant box add nconnolly1/basebox basebox.box
+vagrant package --output ubuntu-20.04-k8s.box
+~~~
+
+Upload package to Vagrant Cloud
+
+~~~sh
+vagrant box add nconnolly1/ubuntu-20.04-k8s ubuntu-20.04-k8s.box
+rm -f ubuntu-20.04-k8s.box
 ~~~
