@@ -45,7 +45,12 @@ if errorlevel 1 (
 
 set "CYGWIN=%SystemDrive%\tools\cygwin"
 
-if not exist "%CYGWIN%\usr\local\bin\Ansible" (
+if not exist "%CYGWIN%\usr\bin\genisoimage" (
+	echo Installing Cygwin genisoimage ...
+	cyg-get genisoimage
+)
+
+if not exist "%CYGWIN%\usr\local\bin\ansible" (
 	echo Installing Cygwin Ansible ...
 	cyg-get openssh python38 python38-pip python38-devel libssl-devel libffi-devel gcc-g++ python38-cryptography
 	"%CYGWIN%\bin\bash" --login -c "/usr/bin/python3.8.exe -m pip install wheel ansible"
