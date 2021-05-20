@@ -36,15 +36,29 @@ if errorlevel 1 (
 	if errorlevel 1 goto :eof
 )
 
-echo Install WSL, then install Vagrant in WSL
-goto :eof
+where /q cygwin
+if errorlevel 1 (
+	echo Installing Cygwin ...
+	choco install cygwin cyg-get -y -r
+	if errorlevel 1 goto :eof
+)
+
+set "CYGWIN=%SystemDrive%\tools\cygwin"
+
+if not exist "%CYGWIN%\usr\local\bin\Ansible" (
+	echo Installing Cygwin Ansible ...
+	cyg-get openssh python38 python38-pip python38-devel libssl-devel libffi-devel gcc-g++ python38-cryptography
+	"%CYGWIN%\bin\bash" --login -c "/usr/bin/python3.8.exe -m pip install wheel ansible"
+)
 
 set "PATH=%SystemDrive%\HashiCorp\Vagrant\bin;%PATH%"
-where /q vagrants
-if not errorlevel 1 (
+where /q vagrant
+if errorlevel 1 (
 	echo Installing Vagrant ...
 	choco install vagrant -y -r
 	if errorlevel 1 goto :eof
 	echo Please reboot the system
 	goto :eof
 )
+
+echo To run from WSL, install WSL, then install Vagrant in WSL and update env.bat
