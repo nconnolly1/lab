@@ -26,3 +26,11 @@ packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" ./windows-20
 Templates for other versions of Windows can be found in the
 [Bento](https://github.com/chef/bento/tree/master/packer_templates/windows)
 project.
+
+The Windows box files seem to be too large to upload reliably through the website.
+Instead use:
+
+~~~sh
+set ATLAS_TOKEN=<....>
+vagrant cloud provider upload nconnolly1/windows-2019 hyperv 1.0.0 windows-2019-standard-hyperv.box
+~~~
