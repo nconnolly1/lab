@@ -7,7 +7,11 @@ trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
 
 if command -v cygpath >/dev/null 2>&1
-then wslpath () { cygpath "$@"; }
+then
+	wslpath () { cygpath "$@"; }
+	mkdir -p "$TMPDIR/bin"
+	install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
+	PATH="$TMPDIR/bin:$PATH"
 fi
 
 copy_inventory_file () {
