@@ -12,6 +12,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider 'hyperv' do |hv|
+    config.vm.network "private_network", bridge: "NATSwitch"
     hv.ip_address_timeout = 240
     hv.memory = 1024
     hv.linked_clone = true
