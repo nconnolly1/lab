@@ -15,12 +15,17 @@ rem default to ansible command
 set ansible=
 if not exist "%~dp0\%1.bat" set ansible=ansible
 
-rem remove quotes from "--extra-vars={...}"
-set args=%args:"--=--%
-set args=%args:"}"="}%
+rem escape '\' for pathnames
+set args=%args:\=\\\\%
 
-rem escape any quotes
+rem adjust quoting of --extra-vars
+set args=%args:"--=--%
+set args=%args:{"=\\{"%
+set args=%args:"}"="\\}%
+
+rem escape special characters
 set args=%args:"=\\\"%
+set args=%args:$=\\\$%
 
 set "ANSIBLE_SH=%~dp0"
 set "ANSIBLE_SH=%ANSIBLE_SH:\=/%ansible.sh"
