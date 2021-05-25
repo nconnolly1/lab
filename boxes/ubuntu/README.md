@@ -14,6 +14,14 @@ cd boxes\ubuntu
 packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" .\ubuntu-20.04-amd64.json
 ~~~
 
+To build an Ubunto 20.04 Kubernetes image:
+
+~~~sh
+env.bat
+cd boxes\ubuntu
+packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" .\ubuntu-20.04-k8s-amd64.json
+~~~
+
 Templates for other versions of Ubuntu can be found in the
 [Bento](https://github.com/chef/bento/tree/master/packer_templates/ubuntu)
 project.
