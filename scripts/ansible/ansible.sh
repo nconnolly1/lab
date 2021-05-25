@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-args=( "$@" )
+argv=( "$@" )
 
 TMPDIR=/tmp/ansible.$$
 trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
@@ -14,53 +14,123 @@ then
 	PATH="$TMPDIR/bin:$PATH"
 fi
 
+dequote () {
+	if [[ "$1" = [\"\']*[\"\'] ]]
+	then echo "${1:1:-1}"
+	else echo "$1"
+	fi
+}
+
+copy_key_file () {
+	KEYFILE="$TMPDIR/"$(uuidgen)
+	x="$(wslpath -u "$1")"
+	tr -d '\r' < "$x" > "$KEYFILE"
+	chmod 0600 "$KEYFILE"
+}
+
 copy_inventory_file () {
 	tr -d '\r' < "$1" |
 	while IFS='' read -r line
 	do
 		KEYARG="ansible_ssh_private_key_file"
-		KEYFILE=$(echo "$line" | sed -n -e"s?.*$KEYARG='\([^']*\)'.*?\1?p")
-		if [ -n "$KEYFILE" ]
+		file=$(echo "$line" | sed -n -e"s?.*$KEYARG='\([^']*\)'.*?\1?p")
+		if [ -n "$file" ]
 		then
-			NEWFILE="$TMPDIR/"$(uuidgen)
-			tr -d '\r' < "$(wslpath -u "$KEYFILE")" > "$NEWFILE"
-			chmod 0400 "$NEWFILE"
-			echo "$line" | sed -E "s|$KEYARG='[^']*'|$KEYARG='$NEWFILE'|"
-		else
-			echo "$line"
+			copy_key_file "$file"
+			line="$(echo "$line" | sed -E "s|$KEYARG='[^']*'|$KEYARG='$KEYFILE'|")"
 		fi
+
+		USERARG="ansible_user"
+		echo "$line" | sed -e"s?$USERARG=[^ \\]*[\\]\([^ ]*\) ?$USERARG=\1 ?"
 	done > "$2"
 }
 
 copy_inventory () {
+	INVENTORY="$TMPDIR/$(basename "$1")"
 	if [ -d "$1" ]
 	then
-		mkdir -p "$2"
+		mkdir -p "$INVENTORY"
 		for file in "$1"/*
-		do copy_inventory_file "$file" "$2/$(basename "$file")"
+		do copy_inventory_file "$file" "$INVENTORY/$(basename "$file")"
 		done
 	else
-		copy_inventory_file "$1" "$2"
+		copy_inventory_file "$1" "$INVENTORY"
 	fi
 }
 
-for ((i = 1 ; i < ${#args[@]} ; i++))
-do
-	arg="${args[$i]}"
+# Disable SSH ControlMaster
+get_ssh_args () {
+	echo "$1" | sed -e"s?-o ControlMaster=[^ ]*??" -e"s?-o ControlPersist=[^ ]*??" \
+		-e"s?\$? -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes?" \
+		-e"s?\$? -o ControlMaster=no?" -e"s? *\$??"
+}
 
-	case "$arg" in
-	--inventory-file=*)
-		INVENTORY=$(wslpath -u "$(echo "$arg" | sed -e"s?^[^=]*=??" -e"s?^[\"']??" -e"s?[\"']\$??")")
-		copy_inventory "$INVENTORY" "$TMPDIR/$(basename "$INVENTORY")"
-		args[$i]="--inventory-file=$TMPDIR/$(basename "$INVENTORY")"
+get_option_arg () {
+	if [[ $option = --*=* ]]
+	then optarg="${option#*=}"
+	else optarg="${argv[((++optind))]}"
+	fi
+
+	optarg="$(dequote "$optarg")"
+}
+
+set_option_arg () {
+	if [[ $option = --*=* ]]
+	then argv[$optind]="${option%%=*}=$1"
+	else argv[$optind]="$1"
+	fi
+}
+
+for ((optind = 1 ; optind < ${#argv[@]} ; optind++))
+do
+	option="${argv[$optind]}"
+
+	case "$option" in
+	--private-key* | --key-file*)
+		get_option_arg
+		copy_key_file "$(wslpath -u "$optarg")"
+		set_option_arg "$KEYFILE"
+		;;
+
+	-i | --inventory* | --inventory-file*)
+		get_option_arg
+		copy_inventory "$(wslpath -u "$optarg")"
+		set_option_arg "$INVENTORY"
+		;;
+
+	--vault-password-file* | --vault-pass-file*)
+		get_option_arg
+		set_option_arg "$(wslpath -u "$optarg")"
+		;;
+
+	--ssh-common-args* | --sftp-extra-args* | --scp-extra-args* | --ssh-extra-args*)
+		get_option_arg
+		set_option_arg "$(get_ssh_args "$optarg")"
+		;;
+
+	-M | --module-path*)
+		get_option_arg
+		echo "Warning: Module path is not supported" 1>&2
+		;;
+
+	-e | --extra-vars*)
+		get_option_arg
+
+		case "$optarg" in
+		ansible_ssh_private_key_file=*)
+			copy_key_file "$(dequote "${optarg#*=}")"
+			set_option_arg "${optarg%%=*}=$KEYFILE"
+			;;
+		esac
+		;;
+
+	*\\*)
+		_path="$(wslpath -u "$option")"
+		[ -e "$_path" ] && set_option_arg "$_path"
 		;;
 	esac
 done
 
-# Disable ssh ControlMaster
-ANSIBLE_SSH_ARGS=$(echo "$ANSIBLE_SSH_ARGS" | sed \
-	-e"s?ControlMaster=[^ ]*?ControlMaster=no?" \
-	-e"s?-o ControlPersist=[^ ]*??" -e"s? *\$??" \
-	)
+[ -n "$ANSIBLE_SSH_ARGS" ] && ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
 
-"${args[@]}"
+"${argv[@]}"
