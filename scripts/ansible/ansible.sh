@@ -92,7 +92,7 @@ do
 		set_option_arg "$KEYFILE"
 		;;
 
-	-i | --inventory* | --inventory-file*)
+	-i | --inventory*)
 		get_option_arg
 		copy_inventory "$(wslpath -u "$optarg")"
 		set_option_arg "$INVENTORY"
