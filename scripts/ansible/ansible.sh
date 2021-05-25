@@ -39,9 +39,7 @@ copy_inventory_file () {
 			copy_key_file "$file"
 			line="$(echo "$line" | sed -E "s|$KEYARG='[^']*'|$KEYARG='$KEYFILE'|")"
 		fi
-
-		USERARG="ansible_user"
-		echo "$line" | sed -e"s?$USERARG=[^ \\]*[\\]\([^ ]*\) ?$USERARG=\1 ?"
+		echo "$line" | sed -e's?\(ansible_user=[^ \\]*\\\)?\1\\?'
 	done > "$2"
 }
 
@@ -58,11 +56,13 @@ copy_inventory () {
 	fi
 }
 
-# Disable SSH ControlMaster
+# Adjust SSH arguments
 get_ssh_args () {
-	echo "$1" | sed -e"s?-o ControlMaster=[^ ]*??" -e"s?-o ControlPersist=[^ ]*??" \
-		-e"s?\$? -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes?" \
-		-e"s?\$? -o ControlMaster=no?" -e"s? *\$??"
+	echo "$1" | sed -e"s?-o ControlMaster=[^ ]*??" \
+		-e"s?-o ControlPersist=[^ ]*??" -e"s?-o UserKnownHostsFile=[^ ]*??" \
+		-e"s?-o IdentitiesOnly==[^ ]*??" -e"s?^?-o ControlMaster=no ?" \
+		-e"s?^?-o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes ?" \
+		-e"s? *\$??"
 }
 
 get_option_arg () {
@@ -131,6 +131,10 @@ do
 	esac
 done
 
-[ -n "$ANSIBLE_SSH_ARGS" ] && ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
+ANSIBLE_HOST_KEY_CHECKING=false
+export ANSIBLE_HOST_KEY_CHECKING
+
+ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
+export ANSIBLE_SSH_ARGS
 
 "${argv[@]}"
