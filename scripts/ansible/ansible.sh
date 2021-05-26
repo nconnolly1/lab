@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-argv=( "$@" )
-
 TMPDIR=/tmp/ansible.$$
 trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
@@ -44,7 +42,8 @@ copy_inventory_file () {
 }
 
 copy_inventory () {
-	INVENTORY="$TMPDIR/$(basename "$1")"
+	x="$(basename "$1")"
+	INVENTORY="$TMPDIR/${x/ /_}"
 	if [ -d "$1" ]
 	then
 		mkdir -p "$INVENTORY"
@@ -80,6 +79,24 @@ set_option_arg () {
 	else argv[$optind]="$1"
 	fi
 }
+
+is_split_arg () {
+	c="${1#[^\'\"\{]*=}"
+	c="${c%%[^\'\"\{]*}"
+	c="${c:0:1}"
+	[[ -n "$c" ]] && [[ "${1: -1:1}" != "${c/\{/\}}" ]]
+}
+
+argv=( )
+
+# Rejoin split arguments
+for ((i = 1 , j = 0; i <= $# ; j++))
+do
+	argv[j]="${@:i++:1}"
+	while [[ $i -le $# ]] && is_split_arg "${argv[j]}"
+	do argv[j]="${argv[j]} ${@:i++:1}"
+	done
+done
 
 for ((optind = 1 ; optind < ${#argv[@]} ; optind++))
 do
