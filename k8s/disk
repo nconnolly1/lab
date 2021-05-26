@@ -1,0 +1,14 @@
+select disk 13
+online disk
+clean
+offline disk
+
+select disk 14
+online disk
+clean
+offline disk
+
+select disk 15
+online disk
+clean
+offline disk
