@@ -92,9 +92,9 @@ argv=( )
 # Rejoin split arguments
 for ((i = 1 , j = 0; i <= $# ; j++))
 do
-	argv[j]="${@:i++:1}"
+	argv[j]="${*:i++:1}"
 	while [[ $i -le $# ]] && is_split_arg "${argv[j]}"
-	do argv[j]="${argv[j]} ${@:i++:1}"
+	do argv[j]="${argv[j]} ${*:i++:1}"
 	done
 done
 
