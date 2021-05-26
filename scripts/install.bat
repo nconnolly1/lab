@@ -66,4 +66,3 @@ if errorlevel 1 (
 	goto :eof
 )
 
-echo To run from WSL, install WSL, then install Vagrant in WSL and update env.bat
