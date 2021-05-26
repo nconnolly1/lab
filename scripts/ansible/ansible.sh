@@ -4,7 +4,9 @@ TMPDIR=/tmp/ansible.$$
 trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
 
-if command -v cygpath >/dev/null 2>&1
+is_cygwin () { command -v cygpath >/dev/null 2>&1; }
+
+if is_cygwin
 then
 	wslpath () { cygpath "$@"; }
 	mkdir -p "$TMPDIR/bin"
@@ -154,4 +156,7 @@ export ANSIBLE_HOST_KEY_CHECKING
 ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
 export ANSIBLE_SSH_ARGS
 
-"${argv[@]}"
+if is_cygwin
+then "${argv[@]}"
+else "${argv[@]}" | sed -u -e's?$?\r?'
+fi
