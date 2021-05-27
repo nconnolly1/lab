@@ -3,6 +3,7 @@
 TMPDIR=/tmp/ansible.$$
 trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
+mkdir -p "$TMPDIR"
 
 is_cygwin () { command -v cygpath >/dev/null 2>&1; }
 
