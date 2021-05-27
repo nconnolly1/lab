@@ -5,7 +5,14 @@
   tasks:
   - name: Install IIS
     win_feature:
-      name: Web-Server
+      name:
+      - Web-Server
+      - Web-Http-Redirect
+      - Web-Net-Ext45
+      - Web-Asp-Net45
+      - Web-ISAPI-Ext
+      - Web-ISAPI-Filter
+      - NET-WCF-HTTP-Activation45
       state: present
       include_sub_features: no
       include_management_tools: yes
