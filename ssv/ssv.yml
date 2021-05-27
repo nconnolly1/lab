@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become_method: runas
+  become: true
+  tasks:
+  - name: Set TESTSIGNING on
+    win_command: bcdedit /set TESTSIGNING on
+
+  - name: Install DataCore certificates
+    win_certificate_store:
+      path: "c:\\install\\{{ item }}"
+      state: present
+      store_location: LocalMachine
+      store_name: TrustedPublisher
+    with_items:
+      - DataCore-1.cer
+      - DataCore-2.cer
+
+  - name: Install SANsymphony
+    win_shell: |
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
+      $proc = Start-Process "C:\install\DataCoreServer.exe" -ArgumentList "\scripted" -PassThru
+      $proc.WaitForExit()
+    args:
+      creates: "C:\\Program Files\\DataCore\\SANsymphony"
+
+  - name: Reboot
+    win_reboot:
