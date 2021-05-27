@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become_method: runas
+  become: true
+  tasks:
+  - name: Install IIS
+    win_feature:
+      name: Web-Server
+      state: present
+      include_sub_features: no
+      include_management_tools: yes
+
+  - name: Multipath IO
+    win_feature:
+      name: Multipath-IO
+      state: present
+
+  - name: Enable iSCSI initiator
+    win_service:
+      name: msiscsi
+      state: started
+      start_mode: auto
