@@ -36,6 +36,14 @@ If WSL is not available, Ansible can be install under Cygwin from an elevated co
 .\install\install-cygwin.bat
 ~~~
 
+### Environment
+
+So setup the environment in order to be able to run Vagrant or Packer, run:
+
+~~~sh
+.\env.bat
+~~~
+
 ## Notes
 
 ### Kubernetes Cluster
