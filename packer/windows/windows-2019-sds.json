@@ -16,7 +16,7 @@
       "iso_url": "{{ user `iso_url` }}",
       "memory": "{{ user `memory` }}",
       "output_directory": "{{ user `build_directory` }}/packer-{{user `template`}}-virtualbox",
-      "secondary_iso_images": [ "{{ user `build_directory` }}/secondary.iso" ],
+      "cd_files": "{{ user `cd_files` }}",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "shutdown_timeout": "15m",
       "switch_name": "{{user `hyperv_switch`}}",
@@ -150,6 +150,6 @@
     "qemu_bios": "/usr/share/OVMF/OVMF_CODE.fd",
     "disk_interface": "ide",
     "boot_wait": "10s",
-    "cd_files": "{{template_dir}}/answer_files/2019/gen2_Autounattend.xml"
+    "cd_files": "{{template_dir}}/answer_files/2019/gen2/Autounattend.xml"
   }
 }

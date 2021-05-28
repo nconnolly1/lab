@@ -45,15 +45,23 @@ if errorlevel 1 (
 
 set "CYGWIN=%SystemDrive%\tools\cygwin"
 
-if not exist "%CYGWIN%\bin\genisoimage.exe" (
-	echo Installing Cygwin genisoimage ...
-	call cyg-get genisoimage
-)
-
 if not exist "%CYGWIN%\usr\local\bin\ansible" (
 	echo Installing Cygwin Ansible ...
 	call cyg-get openssh python38 python38-pip python38-devel libssl-devel libffi-devel gcc-g++ python38-cryptography
 	"%CYGWIN%\bin\bash" --login -c "/usr/bin/python3.8.exe -m pip install wheel \"ansible==3.4.0\" pywinrm"
+)
+
+where /q sed
+if errorlevel 1 (
+	echo Installing sed ...
+	choco install sed -y -r
+	if errorlevel 1 goto :eof
+)
+
+if not exist "%ProgramFiles(x86)%\cdrtfe\tools\cdrtools" (
+	echo Installing cdrtfe ...
+	choco install cdrtfe -y -r
+	if errorlevel 1 goto :eof
 )
 
 set "PATH=%SystemDrive%\HashiCorp\Vagrant\bin;%PATH%"
@@ -64,11 +72,4 @@ if errorlevel 1 (
 	if errorlevel 1 goto :eof
 	echo Please reboot the system
 	goto :eof
-)
-
-where /q sed
-if errorlevel 1 (
-	echo Installing sed ...
-	choco install sed -y -r
-	if errorlevel 1 goto :eof
 )

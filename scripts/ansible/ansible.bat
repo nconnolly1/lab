@@ -1,4 +1,5 @@
 @echo off
+@setlocal enableextensions enabledelayedexpansion
 
 set args=%*
 

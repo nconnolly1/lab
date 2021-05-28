@@ -19,7 +19,6 @@ To build a Windows 2019 Hyper-V image (Gen 2):
 ~~~sh
 env.bat
 cd boxes\windows
-createiso.bat 2019
 packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" ./windows-2019gen2.json
 ~~~
 

@@ -1,6 +1,6 @@
 @echo off
 
-set "PATH=%~dp0\scripts\ansible;%PATH%"
+set "PATH=%~dp0\scripts\ansible;%~dp0\scripts\packer;%PATH%"
 
 rem Could select wsl dynamically based on result of
 rem wsl ansible --version >nul: 2>&1 && check %errorlevel%==0
