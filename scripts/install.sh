@@ -6,3 +6,4 @@ sudo apt install "$PKG"
 rm -f "$PKG"
 
 sudo apt install ansible
+sudo python3 -m pip install pywinrm==0.4.2

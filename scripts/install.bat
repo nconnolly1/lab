@@ -66,3 +66,9 @@ if errorlevel 1 (
 	goto :eof
 )
 
+where /q sed
+if errorlevel 1 (
+	echo Installing sed ...
+	choco install sed -y -r
+	if errorlevel 1 goto :eof
+)

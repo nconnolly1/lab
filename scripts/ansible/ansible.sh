@@ -157,7 +157,4 @@ export ANSIBLE_HOST_KEY_CHECKING
 ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
 export ANSIBLE_SSH_ARGS
 
-if is_cygwin
-then "${argv[@]}"
-else "${argv[@]}" | sed -u -e's?$?\r?'
-fi
+"${argv[@]}"

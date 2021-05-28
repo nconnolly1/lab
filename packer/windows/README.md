@@ -34,3 +34,15 @@ Instead use:
 set ATLAS_TOKEN=<....>
 vagrant cloud provider upload nconnolly1/windows-2019 hyperv 1.0.0 windows-2019-standard-hyperv.box
 ~~~
+
+To use a null builder:
+
+~~~sh
+    {
+      "type": "null",
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_host": "ip-address"
+     }
+~~~
