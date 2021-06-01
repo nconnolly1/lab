@@ -5,11 +5,21 @@ trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
 mkdir -p "$TMPDIR"
 
-is_cygwin () { command -v cygpath >/dev/null 2>&1; }
-
-if is_cygwin
+if command -v cygpath >/dev/null 2>&1
 then
 	wslpath () { cygpath "$@"; }
+fi
+
+if command -v wslpath >/dev/null 2>&1; then :
+else
+	wslpath () {
+		[[ "$1" = "-u" ]] && shift
+		echo "$1" | sed -e's?\\?/?g' -e's?^\([A-Za-z]\):?/mnt/\L\1?'
+	}
+fi
+
+if command -v sudo >/dev/null 2>&1; then :
+else
 	mkdir -p "$TMPDIR/bin"
 	install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
 	PATH="$TMPDIR/bin:$PATH"
@@ -23,7 +33,7 @@ dequote () {
 }
 
 copy_key_file () {
-	KEYFILE="$TMPDIR/"$(uuidgen)
+	KEYFILE="$(mktemp -p "$TMPDIR")"
 	x="$(wslpath -u "$1")"
 	tr -d '\r' < "$x" > "$KEYFILE"
 	chmod 0600 "$KEYFILE"
