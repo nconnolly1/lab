@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 TMPDIR=/tmp/ansible.$$
-trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
-rm -rf "$TMPDIR"
+trap 'rm -rf "$TMPDIR"' EXIT
+trap 'exit 2' SIGINT
 
+rm -rf "$TMPDIR"
 mkdir -p "$TMPDIR/bin"
 install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
 PATH="$TMPDIR/bin:$PATH"

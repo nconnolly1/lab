@@ -35,12 +35,22 @@ if "%ANSIBLE_ENV%"=="docker" (
 ) else if "%ANSIBLE_ENV:~0,3%"=="wsl" (
 	rem Filter the output from WSL to convert <LF> to <CR> <BS> <LF>
 	rem which seems to behave reasonably with both Packer and Vagrant.
-	%ANSIBLE_ENV% bash -c """$(wslpath -u ""$ANSIBLE_SH"")"" %ansible% %args%" | sed -ub -e"s?\r*$?\r\ch?"
+	rem Preserving the return code is based on the technique in:
+	rem https://stackoverflow.com/questions/11170753/windows-command-interpreter-how-to-obtain-exit-code-of-first-piped-command
+	set rc=0
+	( %ANSIBLE_ENV% bash -c """$(wslpath -u ""$ANSIBLE_SH"")"" %ansible% %args%" &^
+		call doskey /exename=ansible rc=%%^^errorlevel%% ) | sed -ub -e"s?\r*$?\r\ch?"
+	for /f "tokens=2 delims==" %%r in ('doskey /m:ansible') do set rc=%%r
+	doskey /exename=ansible rc=
+	exit /b !rc!
 ) else if "%ANSIBLE_ENV%"=="cygwin" (
 	set "PATH=/usr/local/bin;/bin;%PATH%"
 	"%SystemDrive%\tools\cygwin\bin\bash.exe" -c """$(cygpath -u ""$ANSIBLE_SH"")"" %ansible% %args%"
+) else (
+	echo Error: ANSIBLE_ENV is set to "%ANSIBLE_ENV%"
+	exit /b 3
 )
-goto :eof
+exit /b %errorlevel%
 
 :wslpath
 rem path translation for docker
