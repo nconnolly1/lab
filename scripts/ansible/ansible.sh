@@ -3,7 +3,10 @@
 TMPDIR=/tmp/ansible.$$
 trap 'rm -rf "$TMPDIR"; exit 0' EXIT SIGINT
 rm -rf "$TMPDIR"
-mkdir -p "$TMPDIR"
+
+mkdir -p "$TMPDIR/bin"
+install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
+PATH="$TMPDIR/bin:$PATH"
 
 if command -v cygpath >/dev/null 2>&1
 then
@@ -16,13 +19,6 @@ else
 		[[ "$1" = "-u" ]] && shift
 		echo "$1" | sed -e's?\\?/?g' -e's?^\([A-Za-z]\):?/mnt/\L\1?'
 	}
-fi
-
-if command -v sudo >/dev/null 2>&1; then :
-else
-	mkdir -p "$TMPDIR/bin"
-	install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
-	PATH="$TMPDIR/bin:$PATH"
 fi
 
 dequote () {
