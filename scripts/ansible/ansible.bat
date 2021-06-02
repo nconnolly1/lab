@@ -32,10 +32,10 @@ if "%ANSIBLE_ENV%"=="docker" (
 		-e PYTHONUNBUFFERED="%PYTHONUNBUFFERED%" -e ANSIBLE_NOCOLOR="%ANSIBLE_NOCOLOR%" ^
 		-e ANSIBLE_HOST_KEY_CHECKING="%ANSIBLE_HOST_KEY_CHECKING%" ^
 		--entrypoint="/usr/bin/bash" --rm nconnolly/ansible -c "!sh! %ansible% %args%"
-) else if "%ANSIBLE_ENV%"=="wsl" (
+) else if "%ANSIBLE_ENV:~0,3%"=="wsl" (
 	rem Filter the output from WSL to convert <LF> to <CR> <BS> <LF>
 	rem which seems to behave reasonably with both Packer and Vagrant.
-	wsl bash -c """$(wslpath -u ""$ANSIBLE_SH"")"" %ansible% %args%" | sed -ub -e"s?\r*$?\r\ch?"
+	%ANSIBLE_ENV% bash -c """$(wslpath -u ""$ANSIBLE_SH"")"" %ansible% %args%" | sed -ub -e"s?\r*$?\r\ch?"
 ) else if "%ANSIBLE_ENV%"=="cygwin" (
 	set "PATH=/usr/local/bin;/bin;%PATH%"
 	"%SystemDrive%\tools\cygwin\bin\bash.exe" -c """$(cygpath -u ""$ANSIBLE_SH"")"" %ansible% %args%"
