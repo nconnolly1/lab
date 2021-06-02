@@ -23,6 +23,12 @@ kubectl -n mayastor get daemonset mayastor-csi
 ~~~
 
 ~~~sh
+kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/svc.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/svc-headless.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/statefulset.yaml
+~~~
+
+~~~sh
 kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/develop/deploy/moac-deployment.yaml
 kubectl get pods -n mayastor --selector=app=moac
 ~~~

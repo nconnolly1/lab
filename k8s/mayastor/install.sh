@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-#develop
-branch=72a273707e8f2a1f09bcdf18de999873df2db89e
+branch=develop
 
 kubectl label node node-1 openebs.io/engine=mayastor
 kubectl label node node-2 openebs.io/engine=mayastor
@@ -18,6 +17,7 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/de
 kubectl -n mayastor get daemonset mayastor-csi
 
 kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/svc.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/svc-headless.yaml
 kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/statefulset.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/moac-deployment.yaml
