@@ -254,6 +254,8 @@
     },
     {
       "type": "ansible",
+      "use_proxy": false,
+      "extra_arguments": [ "-e", "ansible_ssh_pass=vagrant" ],
       "playbook_file": "{{template_dir}}/../ubuntu-20.04-k8s/kubernetes.yml"
     },
     {
