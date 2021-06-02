@@ -33,7 +33,7 @@ kubectl create -f /vagrant/mayastor/classes.yaml
 kubectl get sc
 kubectl -n mayastor get msp
 
-kubectl create -f /vagrant/mayastor/pvc-1.yaml
-kubectl get pvc ms-volume-claim
+# kubectl create -f /vagrant/mayastor/pvc-1.yaml
+# kubectl get pvc ms-volume-claim
 
-kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/fio.yaml
+# kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/fio.yaml
