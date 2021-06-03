@@ -23,7 +23,11 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/de
 kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/moac-deployment.yaml
 kubectl get pods -n mayastor --selector=app=moac
 
-kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/mayastor-daemonset.yaml
+if [ -f /vagrant/mayastor/${branch}/mayastor-daemonset.yaml ]
+then kubectl apply -f /vagrant/mayastor/${branch}/mayastor-daemonset.yaml
+else kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/mayastor-daemonset.yaml
+fi
+
 kubectl -n mayastor get daemonset mayastor
 
 kubectl -n mayastor get msn

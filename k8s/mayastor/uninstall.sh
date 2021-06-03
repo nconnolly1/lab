@@ -8,7 +8,12 @@ kubectl delete -f /vagrant/mayastor/pvc-2.yaml
 kubectl delete -f /vagrant/mayastor/pvc-3.yaml
 kubectl delete -f /vagrant/mayastor/pools.yaml
 kubectl delete -f /vagrant/mayastor/classes.yaml
-kubectl delete -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/mayastor-daemonset.yaml
+
+if [ -f /vagrant/mayastor/${branch}/mayastor-daemonset.yaml ]
+then kubectl delete -f /vagrant/mayastor/${branch}/mayastor-daemonset.yaml
+else kubectl delete -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/mayastor-daemonset.yaml
+fi
+
 kubectl delete -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/moac-deployment.yaml
 kubectl delete -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/statefulset.yaml
 kubectl delete -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/etcd/svc-headless.yaml
