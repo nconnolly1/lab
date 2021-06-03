@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-branch=develop
+branch=${1:-develop}
 
 kubectl label node node-1 openebs.io/engine=mayastor
 kubectl label node node-2 openebs.io/engine=mayastor
@@ -33,7 +33,8 @@ kubectl create -f /vagrant/mayastor/classes.yaml
 kubectl get sc
 kubectl -n mayastor get msp
 
-# kubectl create -f /vagrant/mayastor/pvc-1.yaml
-# kubectl get pvc ms-volume-claim
+echo kubectl create -f /vagrant/mayastor/pvc-2.yaml
+echo kubectl get pvc ms-volume-claim
 
-# kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/fio.yaml
+echo kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/fio.yaml
+echo kubectl exec -it fio -- fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
