@@ -27,8 +27,8 @@ if "%ANSIBLE_ENV%"=="docker" (
 	call :wslpath %HOMEDRIVE%\ home
 	call :wslpath %CD% work
 	call :wslpath %ANSIBLE_SH% sh
-	docker run -v %HOMEDRIVE%\:!home!:ro -v %CD:~0,2%\:!work:~0,7!:ro ^
-		-v %ANSIBLE_SH:~0,2%\:!sh:~0,7!:ro -w !work! -e ANSIBLE_SSH_ARGS="%ANSIBLE_SSH_ARGS%" ^
+	docker run -v %HOMEDRIVE%\:!home! -v %CD:~0,2%\:!work:~0,7! ^
+		-v %ANSIBLE_SH:~0,2%\:!sh:~0,7! -w !work! -e ANSIBLE_SSH_ARGS="%ANSIBLE_SSH_ARGS%" ^
 		-e PYTHONUNBUFFERED="%PYTHONUNBUFFERED%" -e ANSIBLE_NOCOLOR="%ANSIBLE_NOCOLOR%" ^
 		-e ANSIBLE_HOST_KEY_CHECKING="%ANSIBLE_HOST_KEY_CHECKING%" ^
 		--entrypoint="/usr/bin/bash" --rm nconnolly/ansible -c "!sh! %ansible% %args%"
