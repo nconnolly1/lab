@@ -1,0 +1,50 @@
+;
+;  Database file lab.local.dns for Default zone scope in zone lab.local.
+;      Zone version:  50
+;
+
+@                       IN  SOA giganto. hostmaster. (
+                        		50           ; serial number
+                        		900          ; refresh
+                        		600          ; retry
+                        		86400        ; expire
+                        		3600       ) ; default TTL
+
+;
+;  Zone NS records
+;
+
+@                       NS	giganto.
+
+;
+;  Zone records
+;
+
+host                    A	192.168.50.1
+host-1                  A	192.168.50.41
+host-2                  A	192.168.50.42
+host-3                  A	192.168.50.43
+host-4                  A	192.168.50.44
+host-5                  A	192.168.50.45
+node-1                  A	192.168.50.11
+node-2                  A	192.168.50.12
+node-3                  A	192.168.50.13
+node-4                  A	192.168.50.14
+node-5                  A	192.168.50.15
+node-6                  A	192.168.50.16
+node-7                  A	192.168.50.17
+node-8                  A	192.168.50.18
+node-9                  A	192.168.50.19
+ssv-1                   A	192.168.50.31
+ssv-2                   A	192.168.50.32
+ssv-3                   A	192.168.50.33
+ssv-4                   A	192.168.50.34
+ssv-5                   A	192.168.50.35
+ssv-6                   A	192.168.50.36
+ssv-7                   A	192.168.50.37
+ssv-8                   A	192.168.50.38
+swarm-1                 A	192.168.50.51
+swarm-2                 A	192.168.50.52
+swarm-3                 A	192.168.50.53
+swarm-4                 A	192.168.50.54
+swarm-5                 A	192.168.50.55
