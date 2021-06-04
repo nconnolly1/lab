@@ -3,3 +3,7 @@
 # Scripts
 *.bat                   eol=crlf
 *.ps1                   eol=crlf
+
+# Config
+*.dns					eol=crlf
+*.dhcp					eol=crlf
