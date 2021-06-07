@@ -10,11 +10,8 @@ install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
 PATH="$TMPDIR/bin:$PATH"
 
 if command -v cygpath >/dev/null 2>&1
-then
-	wslpath () { cygpath "$@"; }
-fi
-
-if command -v wslpath >/dev/null 2>&1; then :
+then wslpath () { cygpath "$@"; }
+elif command -v wslpath >/dev/null 2>&1; then :
 else
 	wslpath () {
 		[[ "$1" = "-u" ]] && shift
@@ -90,23 +87,30 @@ set_option_arg () {
 	fi
 }
 
-is_split_arg () {
-	c="${1#[^\'\"\{]*=}"
-	c="${c%%[^\'\"\{]*}"
-	c="${c:0:1}"
-	[[ -n "$c" ]] && [[ "${1: -1:1}" != "${c/\{/\}}" ]]
+print_args () {
+	echo -n "$1: "
+	for ((i = 2 ; i <= $# ; i++))
+	do
+		if [[ $verbosity -ge 3 ]]
+		then echo -n "<${*:i:1}> "
+		else echo -n "${*:i:1} "
+		fi
+	done
+	echo
 }
 
 argv=( )
+verbosity=0
 
-# Rejoin split arguments
+# Build argument list
 for ((i = 1 , j = 0; i <= $# ; j++))
 do
-	argv[j]="${*:i++:1}"
-	while [[ $i -le $# ]] && is_split_arg "${argv[j]}"
-	do argv[j]="${argv[j]} ${*:i++:1}"
-	done
+	x="${*:i++:1}"
+	argv[j]="${x//\\/}"
+	[[ "$x" = -v* ]] && verbosity=$(echo "$x" | tr -dc 'v' | wc -c)
 done
+
+[[ $verbosity -gt 0 ]] && print_args "Executing Ansible.sh" "${argv[@]}"
 
 for ((optind = 1 ; optind < ${#argv[@]} ; optind++))
 do
@@ -132,7 +136,7 @@ do
 
 	--ssh-common-args* | --sftp-extra-args* | --scp-extra-args* | --ssh-extra-args*)
 		get_option_arg
-		set_option_arg "$(get_ssh_args "$optarg")"
+		set_option_arg "'$(get_ssh_args "$optarg")'"
 		;;
 
 	-M | --module-path*)
@@ -151,7 +155,7 @@ do
 		esac
 		;;
 
-	*\\*)
+	[^-]*)
 		_path="$(wslpath -u "$option")"
 		[ -e "$_path" ] && set_option_arg "$_path"
 		;;
@@ -163,5 +167,7 @@ export ANSIBLE_HOST_KEY_CHECKING
 
 ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
 export ANSIBLE_SSH_ARGS
+
+[[ $verbosity -ge 3 ]] && print_args "Executing" "${argv[@]}"
 
 "${argv[@]}"
