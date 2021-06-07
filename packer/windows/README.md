@@ -10,7 +10,7 @@ To build a Windows 2019 image:
 
 ~~~sh
 env.bat
-cd boxes\windows
+cd packer\windows
 packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" ./windows-2019.json
 ~~~
 
@@ -18,7 +18,7 @@ To build a Windows 2019 Hyper-V image (Gen 2):
 
 ~~~sh
 env.bat
-cd boxes\windows
+cd packer\windows
 packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" ./windows-2019gen2.json
 ~~~
 
