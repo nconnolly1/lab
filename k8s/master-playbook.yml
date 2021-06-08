@@ -16,6 +16,8 @@
 
   - name: Initialize the Kubernetes cluster using kubeadm
     command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=10.0.0.0/16
+    args:
+      creates: /etc/kubernetes/admin.conf
 
   - name: Setup .kube directory for vagrant user
     file:
