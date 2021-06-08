@@ -5,15 +5,19 @@ rem default to ansible command
 set args=%*
 if not exist "%~dp0\%1.bat" set "args=ansible %args%"
 
+set "v=%args:* -vv=%"
+if "%v:~0,1%"=="v" echo Running Ansible.bat: %args%
+
 rem quote arguments
-set "tmpfile=%TEMP%\%RANDOM%"
-echo %args% | sed -f "%~dp0\quote-args.sed" > "%tmpfile%"
+set "tmpfile=%TEMP%\ansible-args%RANDOM%"
+echo %args%| sed -f "%~dp0\quote-args.sed" > "%tmpfile%"
 set /p args=<"%tmpfile%"
 del "%tmpfile%
 
+if "%v:~0,1%"=="v" echo Executing Ansible.sh: %args%
+
 set "ANSIBLE_SH=%~dp0"
 set "ANSIBLE_SH=%ANSIBLE_SH:\=/%ansible.sh"
-set "WSLENV=PYTHONUNBUFFERED:ANSIBLE_NOCOLOR:ANSIBLE_HOST_KEY_CHECKING:ANSIBLE_SSH_ARGS:ANSIBLE_SH:%WSLENV%"
 
 if "%ANSIBLE_ENV%"=="docker" (
 	call :wslpath %HOMEDRIVE%\ home
@@ -30,6 +34,7 @@ if "%ANSIBLE_ENV%"=="docker" (
 	rem Preserving the return code is based on the technique in:
 	rem https://stackoverflow.com/questions/11170753/windows-command-interpreter-how-to-obtain-exit-code-of-first-piped-command
 	set rc=0
+	set "WSLENV=PYTHONUNBUFFERED:ANSIBLE_NOCOLOR:ANSIBLE_HOST_KEY_CHECKING:ANSIBLE_SSH_ARGS:ANSIBLE_SH:%WSLENV%"
 	( %ANSIBLE_ENV% bash -c """$(wslpath -u ""$ANSIBLE_SH"")"" %args%" &^
 		call doskey /exename=ansible rc=%%^^errorlevel%% ) | sed -ub -e"s?\r*$?\r\ch?"
 	for /f "tokens=2 delims==" %%r in ('doskey /m:ansible') do set rc=%%r
@@ -46,12 +51,7 @@ exit /b %errorlevel%
 
 :wslpath
 rem path translation for docker
-set arg=%1
-set "arg=%arg:\=/%"
-if "%arg:~1,2%"==":/" (
-	set x=%arg:~0,1%
-	for %%i in (a b c d e f g h i j k l m n o p q r s t u v w x y z) do set x=!x:%%i=%%i!
-	set "arg=/mnt/!x!%arg:~2%"
-)
-set "%2=%arg%"
+echo %1| sed -e"s?\\?/?g;s?^\(.\):/?/mnt/\l\1/?" > "%tmpfile%"
+set /p %2=<"%tmpfile%"
+del "%tmpfile%"
 goto :eof

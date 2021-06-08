@@ -105,12 +105,11 @@ verbosity=0
 # Build argument list
 for ((i = 1 , j = 0; i <= $# ; j++))
 do
-	x="${*:i++:1}"
-	argv[j]="${x//\\/}"
-	[[ "$x" = -v* ]] && verbosity=$(echo "$x" | tr -dc 'v' | wc -c)
+	argv[j]="${*:i++:1}"
+	[[ "${argv[j]}" = -v* ]] && verbosity=$(echo "${argv[j]}" | tr -dc 'v' | wc -c)
 done
 
-[[ $verbosity -gt 0 ]] && print_args "Executing Ansible.sh" "${argv[@]}"
+[[ $verbosity -gt 0 ]] && print_args "Running Ansible.sh" "${argv[@]}"
 
 for ((optind = 1 ; optind < ${#argv[@]} ; optind++))
 do
@@ -168,6 +167,6 @@ export ANSIBLE_HOST_KEY_CHECKING
 ANSIBLE_SSH_ARGS="$(get_ssh_args "$ANSIBLE_SSH_ARGS")"
 export ANSIBLE_SSH_ARGS
 
-[[ $verbosity -ge 3 ]] && print_args "Executing" "${argv[@]}"
+[[ $verbosity -ge 3 ]] && print_args "Executing Ansible" "${argv[@]}"
 
 "${argv[@]}"
