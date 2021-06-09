@@ -20,6 +20,10 @@ set args=--extra-vars {"node_ip":"192.168.50.10"}
 set expect=--extra-vars '{\"node_ip\":\"192.168.50.10\"}'
 call :check
 
+set args=--extra-vars '{"node_ip":"192.168.50.10"}'
+set expect=--extra-vars '{\"node_ip\":\"192.168.50.10\"}'
+call :check
+
 set args=--extra-vars "{"node_ip":"192.168.50.10"}"
 set expect=--extra-vars '{\"node_ip\":\"192.168.50.10\"}'
 call :check
