@@ -10,7 +10,7 @@ if "%v:~0,1%"=="v" echo Running Ansible.bat: %args%
 
 rem quote arguments
 set "tmpfile=%TEMP%\ansible-args%RANDOM%"
-echo %args%| sed -f "%~dp0\quote-args.sed" > "%tmpfile%"
+echo %args%| sed -f "%~dp0\ansible.sed" > "%tmpfile%"
 set /p args=<"%tmpfile%"
 del "%tmpfile%
 
