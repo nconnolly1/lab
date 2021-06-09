@@ -12,7 +12,7 @@ rem quote arguments
 set "tmpfile=%TEMP%\ansible-args%RANDOM%"
 echo %args%| sed -f "%~dp0\ansible.sed" > "%tmpfile%"
 set /p args=<"%tmpfile%"
-del "%tmpfile%
+del "%tmpfile%"
 
 if "%v:~0,1%"=="v" echo Executing Ansible.sh: %args%
 
