@@ -4,36 +4,36 @@
 set "tmpfile=%TEMP%\ansible-test-%RANDOM%"
 set RC=0
 
-set args=-e var1=value1
-set expect=-e 'var1=value1'
+set args=--extra-vars var1=value1
+set expect=--extra-vars 'var1=value1'
 call :check
 
-set args=-e var1="value1"
-set expect=-e 'var1=\"value1\"'
+set args=--extra-vars var1="value1"
+set expect=--extra-vars 'var1=\"value1\"'
 call :check
 
-set args=-e "var1=value1"
-set expect=-e 'var1=value1'
+set args=--extra-vars "var1=value1"
+set expect=--extra-vars 'var1=value1'
 call :check
 
-set args=-e {"node_ip":"192.168.50.10"}
-set expect=-e '{\"node_ip\":\"192.168.50.10\"}'
+set args=--extra-vars {"node_ip":"192.168.50.10"}
+set expect=--extra-vars '{\"node_ip\":\"192.168.50.10\"}'
 call :check
 
-set args=-e "{"node_ip":"192.168.50.10"}"
-set expect=-e '{\"node_ip\":\"192.168.50.10\"}'
+set args=--extra-vars "{"node_ip":"192.168.50.10"}"
+set expect=--extra-vars '{\"node_ip\":\"192.168.50.10\"}'
 call :check
 
 set args=--ssh-extra-args "'-o IdentitiesOnly=yes'"
 set expect=--ssh-extra-args \"'-o IdentitiesOnly=yes'\"
 call :check
 
-set args=-e "ansible_ssh_pass=vagrant test_var=\"{}hi' $there\""
-set expect=-e 'ansible_ssh_pass=vagrant test_var=\"{}hi'\"'\"' \$there\"'
+set args=--extra-vars "ansible_ssh_pass=vagrant test_var=\"{}hi' $there\""
+set expect=--extra-vars 'ansible_ssh_pass=vagrant test_var=\"{}hi'\"'\"' \$there\"'
 call :check
 
-set args=-e "{\"no'de\":\"hel'lo test'\"}"
-set expect=-e '{\"no'\"'\"'de\":\"hel'\"'\"'lo test'\"'\"'\"}'
+set args=--extra-vars "{\"no'de\":\"hel'lo test'\"}"
+set expect=--extra-vars '{\"no'\"'\"'de\":\"hel'\"'\"'lo test'\"'\"'\"}'
 call :check
 
 echo.
@@ -41,21 +41,44 @@ if "%RC%"=="0" ( echo TEST SUCCEEDED ) else echo TEST FAILED
 exit /b %RC%
 
 :check
-call :checkargs
-if "%args:~0,3%"=="-e " (
-	set args=%args:-e =--extra-vars %
-	set expect=%expect:-e =--extra-vars %
-	call :checkargs
-)
+set _args=%args%
+set _expect=%expect%
 if "%args:~0,13%"=="--extra-vars " (
-	set args=%args:--extra-vars =--extra-vars=%
-	set expect=%expect:--extra-vars =--extra-vars=%
+	set args=%_args:--extra-vars =-e %
+	set expect=%_expect:--extra-vars =-e %
 	call :checkargs
-)
-set x=%args:"=#%
-if "%x:~0,15%"=="--extra-vars=#{" (
-	set args=#--extra-vars=%x:~14%
-	set args=!args:#="!
+
+	set args=%_args:--extra-vars =-e%
+	set expect=%_expect:--extra-vars =-e%
+	rem call :checkargs
+
+	set args=%_args:--extra-vars =-e=%
+	set expect=%_expect:--extra-vars =-e=%
+	rem call :checkargs
+
+	set x=!_args:"=#!
+	if "!x:~0,15!"=="--extra-vars #{" (
+		set args=#-e=!x:~14!
+		set args=!args:#="!
+		set expect=!_expect:--extra-vars =-e=!
+		rem call :checkargs
+	)
+
+	set args=%_args%
+	set expect=%_expect%
+	call :checkargs
+
+	set args=%_args:--extra-vars =--extra-vars=%
+	set expect=%_expect:--extra-vars =--extra-vars=%
+	call :checkargs
+
+	set x=!_args:"=#!
+	if "!x:~0,15!"=="--extra-vars #{" (
+		set args=#--extra-vars=!x:~14!
+		set args=!args:#="!
+		call :checkargs
+	)
+) else (
 	call :checkargs
 )
 exit /b 0
