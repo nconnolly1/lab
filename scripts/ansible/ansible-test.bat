@@ -48,20 +48,16 @@ if "%args:~0,13%"=="--extra-vars " (
 	set expect=%_expect:--extra-vars =-e %
 	call :checkargs
 
-	set args=%_args:--extra-vars =-e%
-	set expect=%_expect:--extra-vars =-e%
-	rem call :checkargs
-
 	set args=%_args:--extra-vars =-e=%
 	set expect=%_expect:--extra-vars =-e=%
-	rem call :checkargs
+	call :checkargs
 
 	set x=!_args:"=#!
 	if "!x:~0,15!"=="--extra-vars #{" (
 		set args=#-e=!x:~14!
 		set args=!args:#="!
 		set expect=!_expect:--extra-vars =-e=!
-		rem call :checkargs
+		call :checkargs
 	)
 
 	set args=%_args%
