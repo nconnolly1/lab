@@ -30,7 +30,7 @@ s?\( -e[ =]\)\([^"' =][^ ]*\) ?\1'\2' ?g
 s?\( --extra-vars[ =]'[^'¬]*\)¬?\1"?;ta
 s?\( -e[ =]'[^'¬]*\)¬?\1"?;ta
 
-# escape ' in variables
+# escape single quotes in variables
 :b
 s?\( --extra-vars[ =]'[^'\f]*\)\f?\1\v?;tb
 s?\( -e[ =]'[^'\f]*\)\f?\1\v?;tb
