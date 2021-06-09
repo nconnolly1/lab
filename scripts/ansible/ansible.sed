@@ -1,51 +1,38 @@
-# add spaces at head and tail
-s?^? ?
-s?$? ?
+# add space at head and tail
+s?^\(.*\)$? \1 ?
 
-# preserve escaped quotes
+# rename -e to --Extra-vars
+s?\( ["']\{0,1\}\)-e\([ =]\)?\1--Extra-vars\2?g
+
+# preserve quotes
 s?\\"?¬?g
-
-# preserve quotes from "'str'"
-s?"'?¦'?g
-s?'"?'¦?g
-
-# preserve single quotes
-s?'?\f?g
+s?'?¦?g
 
 # use / for pathnames
 s?\\?/?g
 
 # adjust quoting of JSON values
-s? [¬"']\{0,1\}\(--extra-vars[ =]\)[¬\f"']\{0,1\}\({[^}]*}\)[¬\f"']\{0,1\} ? \1'\2' ?g
-s? [¬"']\{0,1\}\(-e[ =]\)[¬\f"']\{0,1\}\({[^}]*}\)[¬\f"']\{0,1\} ? \1'\2' ?g
+s? [¬¦"]\{0,1\}\(--[Ee]xtra-vars[ =]\)[¬¦"]\{0,1\}\({[^}]*}\)[¬¦"]\{0,1\} ? \1'\2' ?g
 
 # adjust quoting of string values
-s?\( --extra-vars[ =]\)"\([^"]*\)" ?\1'\2' ?g
-s?\( --extra-vars[ =]\)\([^"' ][^ ]*\) ?\1'\2' ?g
-s?\( -e[ =]\)"\([^"]*\)" ?\1'\2' ?g
-s?\( -e[ =]\)\([^"' =][^ ]*\) ?\1'\2' ?g
+s?\( --[Ee]xtra-vars[ =]\)"\([^"]*\)" ?\1'\2' ?g
+s?\( --[Ee]xtra-vars[ =]\)\([^"'= ][^ ]*\) ?\1'\2' ?g
 
 # reinstate quotes within variables
 :a
-s?\( --extra-vars[ =]'[^'¬]*\)¬?\1"?;ta
-s?\( -e[ =]'[^'¬]*\)¬?\1"?;ta
-
-# escape single quotes in variables
-:b
-s?\( --extra-vars[ =]'[^'\f]*\)\f?\1\v?;tb
-s?\( -e[ =]'[^'\f]*\)\f?\1\v?;tb
-s?\v?'¦'¦'?g
+s?\( --[Ee]xtra-vars[ =]'[^'¬]*\)¬?\1"?;ta
+s?\( --[Ee]xtra-vars[ =]'[^'¦]*\)¦?\1\v?;ta
+s?\v?'"'"'?g
 
 # quote special characters
-s?\$?\\$?g
+s?\([\$"]\)?\\\1?g
 
-# reinstate single quotes
-s?\f?'?g
-
-# escape remaining quotes
-s?["¦]?\\"?g
+# reinstate quotes
+s?¦?'?g
 s?¬?\\\\\\"?g
 
+# reinstate -e argument
+s? --Extra-vars? -e?g
+
 # remove spaces at head and tail
-s?^ *??
-s? *$??
+s?^ \(.*\) $?\1?

@@ -72,7 +72,7 @@ get_ssh_args () {
 }
 
 get_option_arg () {
-	if [[ $option = --*=* ]]
+	if [[ $option = --*=* ]] || [[ $option = -e*=* ]]
 	then optarg="${option#*=}"
 	else optarg="${argv[((++optind))]}"
 	fi
@@ -143,7 +143,7 @@ do
 		echo "Warning: Module path is not supported" 1>&2
 		;;
 
-	-e | --extra-vars*)
+	-e* | --extra-vars*)
 		get_option_arg
 
 		case "$optarg" in
