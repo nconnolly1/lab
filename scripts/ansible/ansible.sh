@@ -6,7 +6,12 @@ trap 'exit 2' SIGINT
 
 rm -rf "$TMPDIR"
 mkdir -p "$TMPDIR/bin"
-install "$(dirname "$0")/sudo.sh" "$TMPDIR/bin/sudo"
+
+cat <<\! > "$TMPDIR/bin/sudo"
+#!/usr/bin/env bash
+while getopts ":u:g:E" opt; do :; done; shift $((OPTIND-1)); exec "$@"
+!
+chmod 0755 "$TMPDIR/bin/sudo"
 PATH="$TMPDIR/bin:$PATH"
 
 if command -v cygpath >/dev/null 2>&1
