@@ -1,0 +1,9 @@
+#cloud-config
+users:
+  - name: vagrant
+    password: "$6$vagrant.$sd6r0/OKL.FIGZbhanVkrLassSxoPRv1h5lkISsmBONqaLUGVXkEcD22Ddak5W8JSxeU0VFkU/We1Y7o4hVO/1"
+    lock_passwd: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    shell: /bin/bash
+final_message: "The system is finally up!"
