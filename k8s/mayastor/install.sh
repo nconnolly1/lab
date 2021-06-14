@@ -21,7 +21,8 @@ kube () {
 	fi
 }
 
-( cd /vagrant/mayastor; rm -rf yamls; bash ./fetch-yamls.sh "${branch}" )
+cat "$(dirname "${BASH_SOURCE[0]}")/fetch-yamls.sh" |
+	( cd /vagrant/mayastor; rm -rf yamls; bash -s - "${branch}" )
 
 kubectl label node node-1 openebs.io/engine=mayastor
 kubectl label node node-2 openebs.io/engine=mayastor
