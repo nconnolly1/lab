@@ -5,7 +5,7 @@
   - name: Enable Huge Pages
     lineinfile:
       path: /etc/sysctl.conf
-      line: vm.nr_hugepages = 512
+      line: vm.nr_hugepages = 1024
       create: yes
 
   - name: Update sysctl values
