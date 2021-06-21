@@ -184,6 +184,11 @@ case "$1" in
 	find_build_images "${COMMIT}"
 	;;
 
+v[0-9]*)
+	COMMIT="$1"
+	find_build_images "$1"
+	;;
+
 [a-z]*)
 	find_build_images "$1"
 	;;
