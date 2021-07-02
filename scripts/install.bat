@@ -36,6 +36,13 @@ if errorlevel 1 (
 	if errorlevel 1 goto :eof
 )
 
+where /q vault
+if errorlevel 1 (
+	echo Installing Vault ...
+	choco install vault -y -r
+	if errorlevel 1 goto :eof
+)
+
 where /q sed
 if errorlevel 1 (
 	echo Installing sed ...
