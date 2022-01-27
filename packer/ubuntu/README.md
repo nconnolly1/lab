@@ -1,6 +1,6 @@
 # Ubuntu Images
 
-Based on the Packer templates for Windows in the
+Based on the Packer templates for Ubuntu in the
 [Bento](https://github.com/chef/bento/tree/master/packer_templates/ubuntu)
 project which are licensed under Apache 2.0.
 
