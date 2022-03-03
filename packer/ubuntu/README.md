@@ -10,7 +10,7 @@ To build an Ubunto 20.04 image:
 
 ~~~sh
 env.bat
-cd boxes\ubuntu
+cd packer\ubuntu
 packer build -only=hyperv-iso -force -var "hyperv_switch=NATSwitch" .\ubuntu-20.04-amd64.json
 ~~~
 
