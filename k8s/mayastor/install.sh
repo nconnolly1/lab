@@ -53,7 +53,7 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/de
 kubectl -n mayastor get daemonset mayastor
 
 # Mayastor Kubectl Plugin
-( wget https://github.com/openebs/mayastor-control-plane/releases/download/${branch}/kubectl-mayastor.tar.gz -O /tmp/kubectl-mayastor.tar.gz ) </dev/null
+( wget -q -O /tmp/kubectl-mayastor.tar.gz https://github.com/openebs/mayastor-control-plane/releases/download/${branch}/kubectl-mayastor.tar.gz ) </dev/null
 tar xvof /tmp/kubectl-mayastor.tar.gz
 chmod 0755 kubectl-mayastor
 sudo mv -f kubectl-mayastor /usr/bin/kubectl-mayastor
