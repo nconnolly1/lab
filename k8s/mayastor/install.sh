@@ -1,62 +1,74 @@
 #!/usr/bin/env bash
 
-branch=${1:-develop}
-
-kube () {
-	if [ -f "/vagrant/mayastor/${branch}/$3" ]
-	then
-		echo kubectl $1 $2 "/vagrant/mayastor/${branch}/$3"
-		kubectl $1 $2 "/vagrant/mayastor/${branch}/$3"
-	elif [ -f "/vagrant/mayastor/yamls/$3" ]
-	then
-		echo kubectl $1 $2 "/vagrant/mayastor/yamls/$3"
-		kubectl $1 $2 "/vagrant/mayastor/yamls/$3"
-	elif [ "$3" = "mayastorpoolcrd.yaml" ]
-	then
-		echo kubectl $1 $2 "https://raw.githubusercontent.com/openebs/Mayastor/${branch}/csi/moac/crds/mayastorpool.yaml"
-		kubectl $1 $2 "https://raw.githubusercontent.com/openebs/Mayastor/${branch}/csi/moac/crds/mayastorpool.yaml"
-	else
-		echo kubectl $1 $2 "https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/$3"
-		kubectl $1 $2 "https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/$3"
-	fi
-}
-
-cat "$(dirname "${BASH_SOURCE[0]}")/fetch-yamls.sh" |
-	( cd /vagrant/mayastor; rm -rf yamls; bash -s - "${branch}" )
+branch=${1:-v1.0.1}
 
 kubectl label node node-1 openebs.io/engine=mayastor
 kubectl label node node-2 openebs.io/engine=mayastor
 kubectl label node node-3 openebs.io/engine=mayastor
 
+#
+# Create Mayastor Application Resources
+#
+# Namespace
 kubectl create namespace mayastor
-kube create -f moac-rbac.yaml
-kube apply -f mayastorpoolcrd.yaml
+# RBAC Resources
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/operator-rbac.yaml
+# Custom Resource Definitions
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/mayastorpoolcrd.yaml
 
-kube apply -f nats-deployment.yaml
+#
+# Deploy Mayastor Dependencies
+#
+# NATS
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/nats-deployment.yaml
 kubectl -n mayastor get pods --selector=app=nats
+# etcd
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/storage/localpv.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/statefulset.yaml 
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/svc.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/svc-headless.yaml
+kubectl -n mayastor get pods --selector=app.kubernetes.io/name=etcd
 
-kube apply -f csi-daemonset.yaml
+#
+# Deploy Mayastor Components
+#
+# CSI Node Plugin
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/csi-daemonset.yaml
 kubectl -n mayastor get daemonset mayastor-csi
-
-kube apply -f etcd/svc.yaml
-kube apply -f etcd/svc-headless.yaml
-kube apply -f etcd/statefulset.yaml
-
-kube apply -f moac-deployment.yaml
-kubectl get pods -n mayastor --selector=app=moac
-kube apply -f mayastor-daemonset.yaml
-
+# Core Agents
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/core-agents-deployment.yaml
+kubectl get pods -n mayastor --selector=app=core-agents
+# REST
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/rest-deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/rest-service.yaml
+kubectl get pods -n mayastor --selector=app=rest
+# CSI Controller
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/csi-deployment.yaml
+kubectl get pods -n mayastor --selector=app=csi-controller
+# MSP Operator
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor-control-plane/${branch}/deploy/msp-deployment.yaml
+kubectl get pods -n mayastor --selector=app=msp-operator
+# Data Plane
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/mayastor-daemonset.yaml
 kubectl -n mayastor get daemonset mayastor
 
-kubectl -n mayastor get msn
+# Mayastor Kubectl Plugin
+( wget https://github.com/openebs/mayastor-control-plane/releases/download/${branch}/kubectl-mayastor.tar.gz -O /tmp/kubectl-mayastor.tar.gz ) </dev/null
+tar xvof /tmp/kubectl-mayastor.tar.gz
+chmod 0755 kubectl-mayastor
+sudo mv -f kubectl-mayastor /usr/bin/kubectl-mayastor
+kubectl mayastor get nodes
 
+# Create Storage Pools and Classes
 kubectl create -f /vagrant/mayastor/pools.yaml
 kubectl create -f /vagrant/mayastor/classes.yaml
 kubectl get sc
 kubectl -n mayastor get msp
 
-echo kubectl create -f /vagrant/mayastor/pvc-3.yaml
-echo kubectl get pvc ms-volume-claim
-
-echo kubectl apply -f https://raw.githubusercontent.com/openebs/Mayastor/${branch}/deploy/fio.yaml
-echo kubectl exec -it fio -- fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
+# Run fio test
+cat <<\!
+kubectl create -f /vagrant/mayastor/pvc-1.yaml
+kubectl get pvc ms-volume-claim
+kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/fio.yaml
+kubectl exec -it fio -- fio --name=benchtest --size=800m --filename=/volume/test --direct=1 --rw=randrw --ioengine=libaio --bs=4k --iodepth=16 --numjobs=8 --time_based --runtime=60
+!
