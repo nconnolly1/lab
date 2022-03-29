@@ -2,6 +2,14 @@
 - hosts: all
   become: true
   tasks:
+  - name: Remove /etc/machine-id
+    file:
+      path: /etc/machine-id
+      state: absent
+
+  - name: Generate new machine-id
+    command: systemd-machine-id-setup
+
   - name: Configure node ip
     lineinfile:
       path: /etc/default/kubelet
