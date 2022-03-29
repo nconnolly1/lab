@@ -2,6 +2,15 @@
 
 branch=${1:-v1.0.1}
 
+waitready() {
+	x=$( kubectl get --no-headers pods $* | sed -e's? \([0-9][0-9]*\)/\1  *?All ?' | grep -v 'All Running' | wc -l )
+	[ "$x" != "0" ] && echo "Waiting for pods to become ready ..."
+	while [ "$x" != "0" ]; do
+		sleep 1
+		x=$( kubectl get --no-headers pods $* | sed -e's? \([0-9][0-9]*\)/\1  *?All ?' | grep -v 'All Running' | wc -l )
+	done
+}
+
 kubectl label node node-1 openebs.io/engine=mayastor
 kubectl label node node-2 openebs.io/engine=mayastor
 kubectl label node node-3 openebs.io/engine=mayastor
@@ -28,6 +37,8 @@ kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/de
 kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/svc.yaml
 kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/etcd/svc-headless.yaml
 kubectl -n mayastor get pods --selector=app.kubernetes.io/name=etcd
+
+waitready -n mayastor
 
 #
 # Deploy Mayastor Components
@@ -59,11 +70,15 @@ chmod 0755 kubectl-mayastor
 sudo mv -f kubectl-mayastor /usr/bin/kubectl-mayastor
 kubectl mayastor get nodes
 
+waitready -n mayastor
+
 # Create Storage Pools and Classes
 kubectl create -f /vagrant/mayastor/pools.yaml
 kubectl create -f /vagrant/mayastor/classes.yaml
 kubectl get sc
 kubectl -n mayastor get msp
+
+waitready -n mayastor
 
 # Run fio test
 cat <<\!
