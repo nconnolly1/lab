@@ -63,14 +63,14 @@ kubectl get pods -n mayastor --selector=app=msp-operator
 kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/mayastor-daemonset.yaml
 kubectl -n mayastor get daemonset mayastor
 
+waitready -n mayastor
+
 # Mayastor Kubectl Plugin
 ( wget -q -O /tmp/kubectl-mayastor.tar.gz https://github.com/openebs/mayastor-control-plane/releases/download/${branch}/kubectl-mayastor.tar.gz ) </dev/null
 tar xvof /tmp/kubectl-mayastor.tar.gz
 chmod 0755 kubectl-mayastor
 sudo mv -f kubectl-mayastor /usr/bin/kubectl-mayastor
 kubectl mayastor get nodes
-
-waitready -n mayastor
 
 # Create Storage Pools and Classes
 kubectl create -f /vagrant/mayastor/pools.yaml
@@ -81,7 +81,7 @@ kubectl -n mayastor get msp
 waitready -n mayastor
 
 # Run fio test
-cat <<\!
+cat <<!
 kubectl create -f /vagrant/mayastor/pvc-1.yaml
 kubectl get pvc ms-volume-claim
 kubectl apply -f https://raw.githubusercontent.com/openebs/mayastor/${branch}/deploy/fio.yaml
